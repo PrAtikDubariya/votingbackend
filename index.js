@@ -12,6 +12,8 @@ app.use(bodyParser.json());
 
 const LogInRoute = require("./routes/LogIn");
 
+// localhost://3001/api/signup
+
 app.use("/api", LogInRoute);
 app.listen(PORT, () => {
     console.log(`App Start In ${PORT}`);
