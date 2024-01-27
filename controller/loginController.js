@@ -1,7 +1,7 @@
 const router = require("express").Router();
 const ethers = require('ethers');
 require("dotenv").config();
-const { abi, contractAddress } = require("../constants");
+const { loginABI, loginContractAddress } = require("../constants");
 const nodemailer = require('nodemailer');
 
 const SEPOLIA_RPC_URL = process.env.SEPOLIA_RPC_URL;
@@ -10,7 +10,7 @@ const PRIVATE_KEY = process.env.PRIVATE_KEY;
 
 const provider = new ethers.JsonRpcProvider(SEPOLIA_RPC_URL);
 const wallet = new ethers.Wallet(PRIVATE_KEY, provider);
-const contractInstance = new ethers.Contract(contractAddress, abi, wallet);
+const contractInstance = new ethers.Contract(loginContractAddress, loginABI, wallet);
 
 function OTPGenerator(min, max) {
     

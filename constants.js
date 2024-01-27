@@ -1,136 +1,380 @@
-const contractAddress = "0x039cD6333faBf578245322f066F25e65dB13B5E8";
-const abi = [
+const loginContractAddress = "0x5E9d9De2E526E6717BC085e65F991B8B9D77b71D";
+const loginABI = [
   {
-    "anonymous": false,
-    "inputs": [
+    inputs: [],
+    name: "getAllSignUpData",
+    outputs: [
       {
-        "indexed": true,
-        "internalType": "string",
-        "name": "enrollmentNumber",
-        "type": "string"
-      },
-      {
-        "indexed": false,
-        "internalType": "string",
-        "name": "firstName",
-        "type": "string"
-      },
-      {
-        "indexed": false,
-        "internalType": "string",
-        "name": "lastName",
-        "type": "string"
-      }
-    ],
-    "name": "StudentRegister",
-    "type": "event"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "string",
-        "name": "_enrollmentNumber",
-        "type": "string"
-      }
-    ],
-    "name": "getSignUpData",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "string",
-        "name": "_enrollmentNumber",
-        "type": "string"
-      },
-      {
-        "internalType": "string",
-        "name": "_role",
-        "type": "string"
-      }
-    ],
-    "name": "signIn",
-    "outputs": [
-      {
-        "components": [
-          {
-            "internalType": "string",
-            "name": "role",
-            "type": "string"
-          },
-          {
-            "internalType": "string",
-            "name": "email",
-            "type": "string"
-          },
-          {
-            "internalType": "bool",
-            "name": "isLogin",
-            "type": "bool"
-          }
+        components: [
+          { internalType: "string", name: "firstName", type: "string" },
+          { internalType: "string", name: "lastName", type: "string" },
+          { internalType: "uint64", name: "admissionYear", type: "uint64" },
+          { internalType: "string", name: "enrollmentNumber", type: "string" },
+          { internalType: "string", name: "branch", type: "string" },
+          { internalType: "string", name: "gender", type: "string" },
+          { internalType: "string", name: "email", type: "string" },
         ],
-        "internalType": "struct Login.AdminStudent",
-        "name": "",
-        "type": "tuple"
-      }
+        internalType: "struct Login.SignUp[]",
+        name: "",
+        type: "tuple[]",
+      },
     ],
-    "stateMutability": "view",
-    "type": "function"
+    stateMutability: "view",
+    type: "function",
   },
   {
-    "inputs": [
-      {
-        "internalType": "string",
-        "name": "_firstName",
-        "type": "string"
-      },
-      {
-        "internalType": "string",
-        "name": "_lastName",
-        "type": "string"
-      },
-      {
-        "internalType": "uint64",
-        "name": "_admissionYear",
-        "type": "uint64"
-      },
-      {
-        "internalType": "string",
-        "name": "_enrollmentNumber",
-        "type": "string"
-      },
-      {
-        "internalType": "string",
-        "name": "_branch",
-        "type": "string"
-      },
-      {
-        "internalType": "string",
-        "name": "_gender",
-        "type": "string"
-      },
-      {
-        "internalType": "string",
-        "name": "_email",
-        "type": "string"
-      }
+    inputs: [
+      { internalType: "string", name: "_enrollmentNumber", type: "string" },
     ],
-    "name": "signUpStudents",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  }
+    name: "getSignUpData",
+    outputs: [{ internalType: "bool", name: "", type: "bool" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      { internalType: "string", name: "_enrollmentNumber", type: "string" },
+    ],
+    name: "getSignUpStruct",
+    outputs: [
+      {
+        components: [
+          { internalType: "string", name: "firstName", type: "string" },
+          { internalType: "string", name: "lastName", type: "string" },
+          { internalType: "uint64", name: "admissionYear", type: "uint64" },
+          { internalType: "string", name: "enrollmentNumber", type: "string" },
+          { internalType: "string", name: "branch", type: "string" },
+          { internalType: "string", name: "gender", type: "string" },
+          { internalType: "string", name: "email", type: "string" },
+        ],
+        internalType: "struct Login.SignUp",
+        name: "",
+        type: "tuple",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      { internalType: "string", name: "_enrollmentNumber", type: "string" },
+      { internalType: "string", name: "_role", type: "string" },
+    ],
+    name: "signIn",
+    outputs: [
+      {
+        components: [
+          { internalType: "string", name: "role", type: "string" },
+          { internalType: "string", name: "email", type: "string" },
+          { internalType: "bool", name: "isLogin", type: "bool" },
+        ],
+        internalType: "struct Login.AdminStudent",
+        name: "",
+        type: "tuple",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      { internalType: "string", name: "_firstName", type: "string" },
+      { internalType: "string", name: "_lastName", type: "string" },
+      { internalType: "uint64", name: "_admissionYear", type: "uint64" },
+      { internalType: "string", name: "_enrollmentNumber", type: "string" },
+      { internalType: "string", name: "_branch", type: "string" },
+      { internalType: "string", name: "_gender", type: "string" },
+      { internalType: "string", name: "_email", type: "string" },
+    ],
+    name: "signUpStudents",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+];
+
+const voterRegistrationContractAddress = "0x069f7052e45f712E2D0eF8f65eFEbD5276035F2c";
+const voterRegistrationABI = [
+  {
+    inputs: [
+      { internalType: "address", name: "_loginAddress", type: "address" },
+    ],
+    stateMutability: "nonpayable",
+    type: "constructor",
+  },
+  {
+    inputs: [],
+    name: "getAllVoters",
+    outputs: [
+      {
+        components: [
+          {
+            components: [
+              { internalType: "string", name: "firstName", type: "string" },
+              { internalType: "string", name: "lastName", type: "string" },
+              { internalType: "uint64", name: "admissionYear", type: "uint64" },
+              {
+                internalType: "string",
+                name: "enrollmentNumber",
+                type: "string",
+              },
+              { internalType: "string", name: "branch", type: "string" },
+              { internalType: "string", name: "gender", type: "string" },
+              { internalType: "string", name: "email", type: "string" },
+            ],
+            internalType: "struct Login.SignUp",
+            name: "voter",
+            type: "tuple",
+          },
+          { internalType: "bool", name: "hasVoted", type: "bool" },
+        ],
+        internalType: "struct VoterRegistration.Voter[]",
+        name: "",
+        type: "tuple[]",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "string", name: "_voterId", type: "string" }],
+    name: "getVoter",
+    outputs: [
+      {
+        components: [
+          {
+            components: [
+              { internalType: "string", name: "firstName", type: "string" },
+              { internalType: "string", name: "lastName", type: "string" },
+              { internalType: "uint64", name: "admissionYear", type: "uint64" },
+              {
+                internalType: "string",
+                name: "enrollmentNumber",
+                type: "string",
+              },
+              { internalType: "string", name: "branch", type: "string" },
+              { internalType: "string", name: "gender", type: "string" },
+              { internalType: "string", name: "email", type: "string" },
+            ],
+            internalType: "struct Login.SignUp",
+            name: "voter",
+            type: "tuple",
+          },
+          { internalType: "bool", name: "hasVoted", type: "bool" },
+        ],
+        internalType: "struct VoterRegistration.Voter",
+        name: "",
+        type: "tuple",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "string", name: "_voterId", type: "string" }],
+    name: "modifyVoter",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "string", name: "_voterId", type: "string" }],
+    name: "registerVoter",
+    outputs: [{ internalType: "bool", name: "", type: "bool" }],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "removeAllVoters",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+];
+
+const candidateRegistrationContractAddress = "0x03327b083D6D856c4f15f29AAed3EcCeDe0621EC";
+const candidateRegistrationABI = [
+  {
+    inputs: [
+      { internalType: "address", name: "_loginAddress", type: "address" },
+    ],
+    stateMutability: "nonpayable",
+    type: "constructor",
+  },
+  {
+    inputs: [],
+    name: "getAllCandidate",
+    outputs: [
+      {
+        components: [
+          {
+            components: [
+              { internalType: "string", name: "firstName", type: "string" },
+              { internalType: "string", name: "lastName", type: "string" },
+              { internalType: "uint64", name: "admissionYear", type: "uint64" },
+              {
+                internalType: "string",
+                name: "enrollmentNumber",
+                type: "string",
+              },
+              { internalType: "string", name: "branch", type: "string" },
+              { internalType: "string", name: "gender", type: "string" },
+              { internalType: "string", name: "email", type: "string" },
+            ],
+            internalType: "struct Login.SignUp",
+            name: "candidate",
+            type: "tuple",
+          },
+          { internalType: "uint64", name: "voteCount", type: "uint64" },
+        ],
+        internalType: "struct CandidateRegistration.Candidate[]",
+        name: "",
+        type: "tuple[]",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "string", name: "_candidateId", type: "string" }],
+    name: "getCandidatae",
+    outputs: [
+      {
+        components: [
+          {
+            components: [
+              { internalType: "string", name: "firstName", type: "string" },
+              { internalType: "string", name: "lastName", type: "string" },
+              { internalType: "uint64", name: "admissionYear", type: "uint64" },
+              {
+                internalType: "string",
+                name: "enrollmentNumber",
+                type: "string",
+              },
+              { internalType: "string", name: "branch", type: "string" },
+              { internalType: "string", name: "gender", type: "string" },
+              { internalType: "string", name: "email", type: "string" },
+            ],
+            internalType: "struct Login.SignUp",
+            name: "candidate",
+            type: "tuple",
+          },
+          { internalType: "uint64", name: "voteCount", type: "uint64" },
+        ],
+        internalType: "struct CandidateRegistration.Candidate",
+        name: "",
+        type: "tuple",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "getWinner",
+    outputs: [
+      {
+        components: [
+          {
+            components: [
+              { internalType: "string", name: "firstName", type: "string" },
+              { internalType: "string", name: "lastName", type: "string" },
+              { internalType: "uint64", name: "admissionYear", type: "uint64" },
+              {
+                internalType: "string",
+                name: "enrollmentNumber",
+                type: "string",
+              },
+              { internalType: "string", name: "branch", type: "string" },
+              { internalType: "string", name: "gender", type: "string" },
+              { internalType: "string", name: "email", type: "string" },
+            ],
+            internalType: "struct Login.SignUp",
+            name: "candidate",
+            type: "tuple",
+          },
+          { internalType: "uint64", name: "voteCount", type: "uint64" },
+        ],
+        internalType: "struct CandidateRegistration.Candidate[]",
+        name: "",
+        type: "tuple[]",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "string", name: "_candidateId", type: "string" }],
+    name: "registerCandidate",
+    outputs: [{ internalType: "bool", name: "", type: "bool" }],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "removeAllCandidates",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "string", name: "_candidateId", type: "string" }],
+    name: "sendVote",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+];
+
+const VoteContractAddress = "0xa2C1dA09552e27bc3E539D43B8AF5733Cacd8242";
+const VoteABI = [
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "_voterRegistrationContract",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "_candidateRegistrationContract",
+        type: "address",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "constructor",
+  },
+  {
+    inputs: [
+      { internalType: "string", name: "_voterId", type: "string" },
+      { internalType: "string", name: "_candidateId", type: "string" },
+    ],
+    name: "castVote",
+    outputs: [
+      {
+        components: [
+          { internalType: "bool", name: "hasVote", type: "bool" },
+          { internalType: "bool", name: "registeredVoter", type: "bool" },
+          { internalType: "bool", name: "registeredCanidate", type: "bool" },
+        ],
+        internalType: "struct Vote.VoteConditions",
+        name: "",
+        type: "tuple",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
 ];
 
 module.exports = {
-  contractAddress,
-  abi,
+  loginContractAddress,
+  loginABI,
+  voterRegistrationContractAddress,
+  voterRegistrationABI,
+  candidateRegistrationContractAddress,
+  candidateRegistrationABI,
+  VoteContractAddress,
+  VoteABI,
 };
