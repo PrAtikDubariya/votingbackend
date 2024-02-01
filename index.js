@@ -11,10 +11,11 @@ app.use(express.json());
 app.use(bodyParser.json());
 
 const LogInRoute = require("./routes/LogIn");
+const AdminRoute = require("./routes/Admin");
 
-// localhost://3001/api/signup
+app.use("/api/login", LogInRoute);
+app.use("api/admin", AdminRoute);
 
-app.use("/api", LogInRoute);
 app.listen(PORT, () => {
     console.log(`App Start In ${PORT}`);
 });

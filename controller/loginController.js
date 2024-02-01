@@ -96,7 +96,7 @@ const SignUp = async (req, res) => {
 
         await contractInstance.signUpStudents(firstName, lastName, 
             admissionYear,enrollmentNumber, branch, gender, email);
-
+        
         res.json({
             success:true,
             signUp:true,
@@ -172,8 +172,37 @@ const SignIn = async (req, res) => {
 
 }
 
+const getAllSignUpData = async (req, res) => {
+    
+    try {
+
+        const response = await contractInstance.getAllSignUpData();
+        
+        const signUpData = response.map(data => ({
+            firstName: data.firstName,
+            lastName: data.lastName,
+            enrollmentNumber: data.enrollmentNumber,
+        }));
+        
+        res.json({
+            success: true,
+            signUpData: signUpData
+        });
+
+        
+    } catch (error) {
+        res.json({
+            success: false,
+            error: error.toString()
+        });
+        console.log(error);
+    }
+
+}
+
 module.exports = {
     getOTP: getOTP,
     SignUp: SignUp,
-    SignIn:SignIn,
+    SignIn: SignIn,
+    getAllSignUpData:getAllSignUpData,
 }
