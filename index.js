@@ -14,7 +14,7 @@ const LogInRoute = require("./routes/LogIn");
 const AdminRoute = require("./routes/Admin");
 
 app.use("/api/login", LogInRoute);
-app.use("api/admin", AdminRoute);
+app.use("/api/admin", AdminRoute);
 
 app.listen(PORT, () => {
     console.log(`App Start In ${PORT}`);

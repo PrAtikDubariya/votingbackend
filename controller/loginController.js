@@ -1,4 +1,3 @@
-const router = require("express").Router();
 const ethers = require('ethers');
 require("dotenv").config();
 const { loginABI, loginContractAddress } = require("../constants");
@@ -177,11 +176,14 @@ const getAllSignUpData = async (req, res) => {
     try {
 
         const response = await contractInstance.getAllSignUpData();
-        
         const signUpData = response.map(data => ({
             firstName: data.firstName,
             lastName: data.lastName,
             enrollmentNumber: data.enrollmentNumber,
+            admissionYear: parseInt(data.admissionYear.toString()),
+            branch: data.branch,
+            gender: data.gender,
+            email: data.email
         }));
         
         res.json({
