@@ -1,4 +1,4 @@
-const loginContractAddress = "0x21E84307458A986272a6dE8FEAEe4325AD0c959C";
+const loginContractAddress = "0xa7CC77dBfB2Ff1CcC67D844C0e616Cd237a1511D";
 const loginABI = [
   {
     "inputs": [],
@@ -129,6 +129,92 @@ const loginABI = [
     "inputs": [
       {
         "internalType": "string",
+        "name": "_firstName",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "_lastName",
+        "type": "string"
+      },
+      {
+        "internalType": "uint64",
+        "name": "_admissionYear",
+        "type": "uint64"
+      },
+      {
+        "internalType": "string",
+        "name": "_enrollmentNumber",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "_branch",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "_gender",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "_email",
+        "type": "string"
+      }
+    ],
+    "name": "modifySignUpData",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "string",
+            "name": "firstName",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "lastName",
+            "type": "string"
+          },
+          {
+            "internalType": "uint64",
+            "name": "admissionYear",
+            "type": "uint64"
+          },
+          {
+            "internalType": "string",
+            "name": "enrollmentNumber",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "branch",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "gender",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "email",
+            "type": "string"
+          }
+        ],
+        "internalType": "struct Login.SignUp",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
         "name": "_enrollmentNumber",
         "type": "string"
       }
@@ -230,7 +316,7 @@ const loginABI = [
   }
 ];
 
-const voterRegistrationContractAddress = "0xdEF2a17258E788647D37eca0F95626221dc97f8F";
+const voterRegistrationContractAddress = "0x0462ABaC27840cb6f6B2D8509D794d78F5F2DFBF";
 const voterRegistrationABI = [
   {
     "inputs": [
@@ -394,6 +480,25 @@ const voterRegistrationABI = [
         "type": "string"
       }
     ],
+    "name": "modifyVoterData",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "_voterId",
+        "type": "string"
+      }
+    ],
     "name": "registerVoter",
     "outputs": [
       {
@@ -411,11 +516,30 @@ const voterRegistrationABI = [
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "_voterId",
+        "type": "string"
+      }
+    ],
+    "name": "removeSingleVoter",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
   }
 ];
 
-const candidateRegistrationContractAddress = "0x2F21712FA84e28ca68FCAc26648C42c4bf74a5d2";
-const candidateRegistrationABI = [
+const candidateRegistrationContractAddress = "0xD64C5B66fcA9c6f0eaD0C28eD245Cef4A78379fB";
+const candidateRegistrationABI =  [
   {
     "inputs": [
       {
@@ -627,6 +751,25 @@ const candidateRegistrationABI = [
         "type": "string"
       }
     ],
+    "name": "modfiyCandidateData",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "_candidateId",
+        "type": "string"
+      }
+    ],
     "name": "registerCandidate",
     "outputs": [
       {
@@ -660,7 +803,7 @@ const candidateRegistrationABI = [
   }
 ];
 
-const VoteContractAddress = "0xC975B3bCE76B0Ba2352270D5a67F8F30EaAAA828";
+const VoteContractAddress = "0x42c350ac7bE3ea30808015DCF82B0c846fD35884";
 const VoteABI = [
   {
     "inputs": [

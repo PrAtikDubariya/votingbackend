@@ -1,9 +1,12 @@
 const ethers = require('ethers');
 require("dotenv").config();
-const { loginABI,
-    loginContractAddress,
+const {
+    // loginABI,
+    // loginContractAddress,
     candidateRegistrationContractAddress,
-    candidateRegistrationABI
+    candidateRegistrationABI,
+    voterRegistrationContractAddress,
+    voterRegistrationABI
 } = require("../constants");
 
 const SEPOLIA_RPC_URL = process.env.SEPOLIA_RPC_URL;
@@ -12,28 +15,34 @@ const PRIVATE_KEY = process.env.PRIVATE_KEY;
 
 const provider = new ethers.JsonRpcProvider(SEPOLIA_RPC_URL);
 const wallet = new ethers.Wallet(PRIVATE_KEY, provider);
-const contractInstance = new ethers.Contract(loginContractAddress, loginABI, wallet);
 
+// const contractInstance = new ethers.Contract(loginContractAddress, loginABI, wallet);
+const voterContractInstance = new ethers.Contract(voterRegistrationContractAddress, voterRegistrationABI, wallet);
 const candidateContractInstance = new ethers.Contract(candidateRegistrationContractAddress, candidateRegistrationABI, wallet);
+
+const enrollmentNumberLock = {}
 
 const getAllVoters = async (req, res) => {
     
     try {
 
-        const response = await contractInstance.getAllSignUpData();
-        const signUpData = response.map(data => ({
-            firstName: data.firstName,
-            lastName: data.lastName,
-            enrollmentNumber: data.enrollmentNumber,
-            admissionYear: parseInt(data.admissionYear.toString()),
-            branch: data.branch,
-            gender: data.gender,
-            email: data.email
-        }));
-        
+        const response = await voterContractInstance.getAllVoters();
+        const voterData = response.map(voter => {
+            return {
+                firstName: voter[0][0],
+                lastName: voter[0][1],
+                admissionYear: Number(voter[0][2]),
+                enrollmentNumber: voter[0][3],
+                branch: voter[0][4],
+                gender: voter[0][5],
+                email: voter[0][6],
+                hasVoted: voter[1],
+            };
+          });
+        console.log(response);
         res.json({
             success: true,
-            signUpData: signUpData
+            voterData:voterData,
         });
 
         
@@ -49,50 +58,40 @@ const getAllVoters = async (req, res) => {
 const getSingleVoter = async (req, res) => {
     
     try {
+        let { enrollmentNumber } = req.body;
+        enrollmentNumber = enrollmentNumber.toLowerCase();
 
-        const { enrollmentNumber } = req.body;
-        const enrollmentNumbers = enrollmentNumber.toLowerCase();
+        const response = await voterContractInstance.getVoter(enrollmentNumber);
+        const voterData = {
+            firstName: response[0][0],
+            lastName: response[0][1],
+            admissionYear: Number(response[0][2]),
+            enrollmentNumber: response[0][3],
+            branch: response[0][4],
+            gender: response[0][5],
+            email: response[0][6],
+            hasVoted: response[1],
+        };
 
-        const response = await contractInstance.getSignUpStruct(enrollmentNumbers);
-
-        const signUpData = {
-            firstName: response[0],
-            lastName: response[1],
-            admissionYear: Number(response[2]),
-            enrollmentNumber: response[3],
-            branch: response[4],
-            gender: response[5],
-            email: response[6],
-        }
-        
         res.json({
             success: true,
-            signUpData: signUpData
+            voterData: voterData
         });
-
-        console.log(response);
-
-        res.json({
-            success: true,
-            SingleVoter:signUpData,
-        })
-
     } catch (error) {
-        res.json({
+        res.status(500).json({
             success: false,
             error: error.toString()
         });
-        console.log(error);
     }
 
 }
 
 const registerCandidate = async (req, res) => {
 
-    try {
+    const { enrollmentNumber } = req.body;
+    const enrollmentNumbers = enrollmentNumber.toLowerCase();
 
-        const { enrollmentNumber } = req.body;
-        const enrollmentNumbers = enrollmentNumber.toLowerCase();
+    try {
 
         const response = await candidateContractInstance.getCandidatae(enrollmentNumbers);
 
@@ -110,22 +109,40 @@ const registerCandidate = async (req, res) => {
             voteCount:Number(voteCount),
         };
 
-        if (candidateObject.enrollmentNumber === enrollmentNumber) {
+        if (candidateObject.enrollmentNumber === enrollmentNumbers) {
             res.json({
                 success: true,
                 candidate: candidateObject,
             });
         }
         else {
-            await candidateContractInstance.registerCandidate(enrollmentNumber);
-            
-            res.json({
-                success: true,
-                candidate:candidateObject,
-            })
+            if (enrollmentNumberLock[enrollmentNumbers]) {
+                console.log("CONSOLE",enrollmentNumberLock[enrollmentNumbers]);
+                res.json({
+                    success: true,
+                    candidate: candidateObject,
+                    isLock:enrollmentNumberLock[enrollmentNumbers]
+                });
+            } else {
+                enrollmentNumberLock[enrollmentNumbers] = true;
+                console.log("console",enrollmentNumberLock[enrollmentNumbers]);
+                const response = await candidateContractInstance.registerCandidate(enrollmentNumbers);
+                const txResponse = await response.wait(1);
+                console.log(await response.hash);
+                
+
+                enrollmentNumberLock[enrollmentNumbers] = false;
+                res.json({
+                    success: true,
+                    candidate: candidateObject,
+                    isLock:enrollmentNumberLock[enrollmentNumbers]
+                });
+                delete enrollmentNumberLock[enrollmentNumbers];
+            }
         }
 
     } catch (error) {
+        delete enrollmentNumberLock[enrollmentNumbers];
         res.json({
             success: false,
             error: error.toString()
@@ -137,10 +154,56 @@ const registerCandidate = async (req, res) => {
 
 const removeAllCandidates = async (req, res) => {
     try {
-        await candidateContractInstance.removeAllCandidates();
+        const response = await candidateContractInstance.removeAllCandidates();
+        const txResponse = await response.wait(1);
+        console.log(await response.hash);
+        console.log(txResponse);
+        
         res.json({
-            success: true
+            success: true,
+            message:"All Candidate has been removed"
         });
+    } catch (error) {
+        res.json({
+            success: false,
+            error: error.toString()
+        });
+        console.log(error);
+    }
+}
+
+const removeAllVoter = async (req, res) => {
+    try {
+        const response = await voterContractInstance.removeAllVoters();
+        const txResponse = await response.wait(1);
+        console.log(response.hash);
+        res.json({
+            success: true,
+            message:"All Voters has been removed"
+        });
+    } catch (error) {
+        res.json({
+            success: false,
+            error: error.toString()
+        });
+        console.log(error);
+    }
+}
+
+const removeSingleVoter = async (req, res) => {
+    try {
+        let { enrollmentNumber } = req.body;
+        enrollmentNumber = enrollmentNumber.toLowerCase();
+
+        const response = await voterContractInstance.removeSingleVoter(enrollmentNumber);
+        const txResponse = await response.wait();
+        console.log(await response.hash);
+
+        res.json({
+            success: true,
+            isRemoved: response
+        });
+
     } catch (error) {
         res.json({
             success: false,
@@ -159,12 +222,12 @@ const getAllCandidate = async (req, res) => {
             return {
                 firstName: candidate[0][0],
                 lastName: candidate[0][1],
-                admissionYear: Number(candidate[0][2]), // Convert to Number
+                admissionYear: Number(candidate[0][2]),
                 enrollmentNumber: candidate[0][3],
                 branch: candidate[0][4],
                 gender: candidate[0][5],
                 email: candidate[0][6],
-                voteCount: Number(candidate[1]), // Convert to Number
+                voteCount: Number(candidate[1]),
             };
           });
 
@@ -186,6 +249,8 @@ module.exports = {
     getAllVoters: getAllVoters,
     registerCandidate: registerCandidate,
     removeAllCandidates: removeAllCandidates,
+    removeAllVoter: removeAllVoter,
     getAllCandidate: getAllCandidate,
     getSingleVoter: getSingleVoter,
+    removeSingleVoter: removeSingleVoter,
 }
