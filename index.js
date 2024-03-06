@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+const http = require("http");
 const bodyParser = require("body-parser");
 const cors = require('cors');
 const cookieParser = require("cookie-parser");
@@ -17,9 +18,23 @@ app.use(cookieParser());
 const LogInRoute = require("./routes/LogIn");
 const AdminRoute = require("./routes/Admin");
 
-app.use("/api/login", LogInRoute);
-app.use("/api/admin", AdminRoute);
 
-app.listen(PORT, () => {
-    console.log(`App Start In ${PORT}`);
+
+const connectWithDB = require("./config/database");
+connectWithDB();
+
+const server = app.listen(PORT, () => {
+  console.log(`Server Start In ${PORT}`);
 });
+
+const io = require("socket.io")(server, {
+  cors: {
+    origin: "*",
+  }
+});
+app.set('io', io);
+io.on('connection', (socket) => {
+  app.use("/api/login", LogInRoute);
+  app.use("/api/admin", AdminRoute);
+})
+

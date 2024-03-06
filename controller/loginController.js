@@ -2,8 +2,11 @@ const ethers = require('ethers');
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const { loginABI, loginContractAddress, candidateRegistrationABI, candidateRegistrationContractAddress,
-voterRegistrationABI,voterRegistrationContractAddress} = require("../constants");
+voterRegistrationABI,voterRegistrationContractAddress, VoteContractAddress, VoteABI} = require("../constants");
 const nodemailer = require('nodemailer');
+const enrollmentJSON = require("../model/votingSchema");
+const votingSchema = require('../model/votingSchema');
+
 
 const SEPOLIA_RPC_URL = process.env.SEPOLIA_RPC_URL;
 const PRIVATE_KEY = process.env.PRIVATE_KEY;
@@ -24,6 +27,16 @@ const voterContractInstance = new ethers.Contract(
     wallet
 );
 
+const VoteContractInstance = new ethers.Contract(VoteContractAddress, VoteABI, wallet);
+
+let transporter = nodemailer.createTransport({
+    host: process.env.MAIL_HOST,
+    auth: {
+        user: process.env.MAIL_USER,
+        pass: process.env.MAIL_PASS,
+    }
+});
+
 function OTPGenerator(min, max) {
     
     min = Math.ceil(min);
@@ -35,34 +48,30 @@ function OTPGenerator(min, max) {
 
 const SignUpCheck = async (enrollmentNumber) => {
 
-        console.log(enrollmentNumber);
+    console.log(enrollmentNumber);
 
-        const Response = await contractInstance.getSignUpData(enrollmentNumber);
-        console.log(Response);
-
-        return Response;
+    const response = await contractInstance.getSignUpData(enrollmentNumber);
+    console.log(response);
+    
+    if (response[3] === "") {
+        return false;
+    } else {
+        return true;
+    }
 
 }
 
 const getOTP = async (req, res) => {
     
     try {
-        const { enrollmentNumber,email } = req.body;
-        
+        let { enrollmentNumber,email } = req.body;
+        enrollmentNumber = enrollmentNumber.toUpperCase();
         const Response = await SignUpCheck(enrollmentNumber);
         console.log(enrollmentNumber,email);
         if (!Response) {
             const otp = OTPGenerator(100000, 999999);
             console.log(otp);
             try {
-
-                let transporter = nodemailer.createTransport({
-                    host: process.env.MAIL_HOST,
-                    auth: {
-                        user: process.env.MAIL_USER,
-                        pass: process.env.MAIL_PASS,
-                    }
-                });
 
                 console.log(email);
             
@@ -104,15 +113,29 @@ const SignUp = async (req, res) => {
     
     try {
 
-        const { firstName, lastName, enrollmentNumber, admissionYear, branch, gender, email } = req.body;
+        let { firstName, lastName, enrollmentNumber, admissionYear, branch, gender, email } = req.body;
 
+        enrollmentNumber = enrollmentNumber.toUpperCase();
+        gender = gender.toUpperCase();
+        branch = branch.toUpperCase();
+        console.log(enrollmentNumber,branch,gender);
         const response = await contractInstance.signUpStudents(firstName, lastName, 
             admissionYear, enrollmentNumber, branch, gender, email);
         
         const txResponse = await response.wait(1);
-        console.log(await response.hash);
+        const hash = await response.hash;
+        console.log(hash);
         console.log(txResponse);
-        
+
+        let info = transporter.sendMail({
+            from: `Voting Portal`,
+            to: `${email}`,
+            subject: `OTP for Voting Portal`,
+            html: `<h2>Hey User,</h2>
+                   <h3>Thank you for Sign Up</h3>
+                   <a href="https://sepolia.etherscan.io/tx/${hash}">Confirm Your Transaction</a>`
+        });
+
         res.json({
             success:true,
             signUp:true,
@@ -129,23 +152,21 @@ const SignIn = async (req, res) => {
     
     try {
 
-        const { enrollmentNumber, role } = req.body;
+        let { enrollmentNumber, role } = req.body;
 
-        const response = await contractInstance.signIn(enrollmentNumber, role);
+        if (enrollmentNumber === "ldrp123") {
+            enrollmentNumber = enrollmentNumber;
+        } else {
+            enrollmentNumber = enrollmentNumber.toUpperCase();   
+        }
+
+        const response = await contractInstance.logIn(enrollmentNumber, role);
 
         if (response.isLogin) {
 
             const otp = OTPGenerator(100000, 999999);
 
             try {
-
-                let transporter = nodemailer.createTransport({
-                    host: process.env.MAIL_HOST,
-                    auth: {
-                        user: process.env.MAIL_USER,
-                        pass: process.env.MAIL_PASS,
-                    }
-                });
 
                 console.log(response.email);
             
@@ -154,7 +175,7 @@ const SignIn = async (req, res) => {
                     to: `${response.email}`,
                     subject: `OTP for Voting Portal`,
                     html: `<h2>Hey User,</h2>
-                           <h3>Thank you for Sign Up</h3>
+                           <h3>Thank you for Log In</h3>
                            <p>Your One Time Password is : ${otp}</p>`
                 });
                 
@@ -192,13 +213,13 @@ const SignIn = async (req, res) => {
 
 const getSignUpStruct = async (req, res) => {
 
-    const { enrollmentNumber } = req.body;
+    let { enrollmentNumber } = req.body;
     console.log(enrollmentNumber);
-    const enrollmentNumbers = enrollmentNumber.toLowerCase();
-    console.log(enrollmentNumbers);
+    enrollmentNumber = enrollmentNumber.toUpperCase();
+    console.log(enrollmentNumber);
     try {
 
-        const response = await contractInstance.getSignUpStruct(enrollmentNumbers);
+        const response = await contractInstance.getSignUpData(enrollmentNumber);
 
         const signUpStruct = {
             firstName: response[0],
@@ -259,12 +280,12 @@ const getAllSignUpData = async (req, res) => {
 }
 
 const getOTPRegistration = async (req, res) => {
-    const { enrollmentNumber } = req.body;
+    let { enrollmentNumber } = req.body;
 
-    const enrollmentNumbers = enrollmentNumber.toLowerCase();
+    enrollmentNumber = enrollmentNumber.toUpperCase();
 
     try {
-        const response = await contractInstance.getSignUpStruct(enrollmentNumbers);
+        const response = await contractInstance.getSignUpData(enrollmentNumber);
 
         const signUpStruct = {
             firstName: response[0],
@@ -279,14 +300,6 @@ const getOTPRegistration = async (req, res) => {
         const otp = OTPGenerator(100000, 999999);
 
             try {
-
-                let transporter = nodemailer.createTransport({
-                    host: process.env.MAIL_HOST,
-                    auth: {
-                        user: process.env.MAIL_USER,
-                        pass: process.env.MAIL_PASS,
-                    }
-                });
 
                 console.log(response.email);
             
@@ -323,10 +336,11 @@ const getOTPRegistration = async (req, res) => {
 
 const registerVoter = async (req, res) => {
     try {
-        const { enrollmentNumber } = req.body;
-        const ENROLLMENT_NUMBER = enrollmentNumber.toLowerCase();
+        let { enrollmentNumber } = req.body;
+        enrollmentNumber = enrollmentNumber.toUpperCase();
 
-        const getVoter = await voterContractInstance.getVoter(ENROLLMENT_NUMBER);
+        const verifyEnrollment = await votingSchema.enrollmentJSON.findOne({ "Enrollment Number": enrollmentNumber });
+        const getVoter = await voterContractInstance.getVoter(enrollmentNumber);
 
         const voter = getVoter[0];
 
@@ -341,20 +355,41 @@ const registerVoter = async (req, res) => {
             hasVoted:getVoter[1]
         }
 
-        if (voterObject.enrollmentNumber.toLowerCase() === ENROLLMENT_NUMBER) {
-            res.json({
-                success: true,
-                voterObject: voterObject
-            });
+        if (verifyEnrollment !== null &&  enrollmentNumber === verifyEnrollment['Enrollment Number']) {
+            if (voterObject.enrollmentNumber.toUpperCase() === enrollmentNumber) {
+                res.json({
+                    success: true,
+                    message:`${verifyEnrollment['Enrollment Number']} is Already Registered `,
+                    voterObject: voterObject
+                });
+            } else {
+                const response = await voterContractInstance.registerVoter(enrollmentNumber);
+                const txResponse = await response.wait(1);
+                console.log(await response.hash);
+                console.log(txResponse);
+    
+                const getVoter = await voterContractInstance.getVoter(enrollmentNumber);
+                
+                let info = transporter.sendMail({
+                    from: `Voting Portal`,
+                    to: `${getVoter[0][6]}`,
+                    subject: `Sucessful Registration`,
+                    html: `<h2>Hey User,</h2>
+                           <h3>Thank you for Register as Voter</h3>
+                           <a href="https://sepolia.etherscan.io/tx/${response.hash}">Check Your Transaction</a>`
+                });
+    
+                res.json({
+                    success: true,
+                    voterObject: voterObject
+                });
+            }
         } else {
-            const response = await voterContractInstance.registerVoter(ENROLLMENT_NUMBER);
-            const txResponse = await response.wait(1);
-            console.log(await response.hash);
-            console.log(txResponse);
             res.json({
                 success: true,
-                voterObject: voterObject
-            });
+                message:`${enrollmentNumber} is Not Valid`,
+                voterObject:voterObject
+            })
         }
         
     } catch (error) {
@@ -368,10 +403,10 @@ const registerVoter = async (req, res) => {
 
 const registerCandidate = async (req, res) => {
     try {
-        const { enrollmentNumber } = req.body;
-        const ENROLLMENT_NUMBER = enrollmentNumber.toLowerCase();
+        let { enrollmentNumber } = req.body;
+        enrollmentNumber = enrollmentNumber.toUpperCase();
 
-        const response = await candidateContractInstance.getCandidatae(ENROLLMENT_NUMBER);
+        const response = await candidateContractInstance.getCandidatae(enrollmentNumber);
         console.log(response);
 
         const candidateInfoArray = response[0];
@@ -394,7 +429,42 @@ const registerCandidate = async (req, res) => {
         });
     } catch (error) {
         res.json({
+            success: false,
+            error: error.toString()
+        });
+    }
+}
+
+const submitVotes = async (req, res) => {
+    try {
+
+        let { voterId, candidateId } = req.body;
+        voterId = voterId.toUpperCase();
+        candidateId = candidateId.toUpperCase();
+        const response = await VoteContractInstance.submitVotes(voterId, candidateId);
+        const txReceipt = await response.wait(1);
+        
+        const eventFilter = VoteContractInstance.filters.VoteConditions();
+        const events = await VoteContractInstance.queryFilter(eventFilter);
+        let VoteConditions = {
+            hasVoted: false,
+            registeredVoter: false,
+            registeredCandidate:false
+        };
+        events.forEach(event => {
+            VoteConditions.hasVoted = event.args[0]
+            VoteConditions.registeredVoter = event.args[1]
+            VoteConditions.registeredCandidate = event.args[2]
+        });
+        res.json({
             success: true,
+            message: "Response Send",
+            response:VoteConditions
+        });
+        
+    } catch (error) {
+        res.json({
+            success: false,
             error: error.toString()
         });
     }
@@ -409,4 +479,5 @@ module.exports = {
     registerVoter: registerVoter,
     registerCandidate: registerCandidate,
     getOTPRegistration, getOTPRegistration,
+    submitVotes: submitVotes,
 }

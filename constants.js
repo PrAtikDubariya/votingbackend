@@ -1,5 +1,87 @@
-const loginContractAddress = "0xa7CC77dBfB2Ff1CcC67D844C0e616Cd237a1511D";
+const loginContractAddress = "0x00c62c89d4225A6cb4a21f0cd18EFdB6eF97AEaD";
 const loginABI = [
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "string",
+            "name": "firstName",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "lastName",
+            "type": "string"
+          },
+          {
+            "internalType": "uint64",
+            "name": "admissionYear",
+            "type": "uint64"
+          },
+          {
+            "internalType": "string",
+            "name": "enrollmentNumber",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "branch",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "gender",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "email",
+            "type": "string"
+          }
+        ],
+        "indexed": false,
+        "internalType": "struct Login.SignUp",
+        "name": "student",
+        "type": "tuple"
+      }
+    ],
+    "name": "StudentModify",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "hasDelete",
+        "type": "bool"
+      }
+    ],
+    "name": "StudentRemoved",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "enrollmentNumber",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "email",
+        "type": "string"
+      }
+    ],
+    "name": "StudentsSignUp",
+    "type": "event"
+  },
   {
     "inputs": [],
     "name": "getAllSignUpData",
@@ -61,25 +143,6 @@ const loginABI = [
     "name": "getSignUpData",
     "outputs": [
       {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "string",
-        "name": "_enrollmentNumber",
-        "type": "string"
-      }
-    ],
-    "name": "getSignUpStruct",
-    "outputs": [
-      {
         "components": [
           {
             "internalType": "string",
@@ -123,111 +186,6 @@ const loginABI = [
       }
     ],
     "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "string",
-        "name": "_firstName",
-        "type": "string"
-      },
-      {
-        "internalType": "string",
-        "name": "_lastName",
-        "type": "string"
-      },
-      {
-        "internalType": "uint64",
-        "name": "_admissionYear",
-        "type": "uint64"
-      },
-      {
-        "internalType": "string",
-        "name": "_enrollmentNumber",
-        "type": "string"
-      },
-      {
-        "internalType": "string",
-        "name": "_branch",
-        "type": "string"
-      },
-      {
-        "internalType": "string",
-        "name": "_gender",
-        "type": "string"
-      },
-      {
-        "internalType": "string",
-        "name": "_email",
-        "type": "string"
-      }
-    ],
-    "name": "modifySignUpData",
-    "outputs": [
-      {
-        "components": [
-          {
-            "internalType": "string",
-            "name": "firstName",
-            "type": "string"
-          },
-          {
-            "internalType": "string",
-            "name": "lastName",
-            "type": "string"
-          },
-          {
-            "internalType": "uint64",
-            "name": "admissionYear",
-            "type": "uint64"
-          },
-          {
-            "internalType": "string",
-            "name": "enrollmentNumber",
-            "type": "string"
-          },
-          {
-            "internalType": "string",
-            "name": "branch",
-            "type": "string"
-          },
-          {
-            "internalType": "string",
-            "name": "gender",
-            "type": "string"
-          },
-          {
-            "internalType": "string",
-            "name": "email",
-            "type": "string"
-          }
-        ],
-        "internalType": "struct Login.SignUp",
-        "name": "",
-        "type": "tuple"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "string",
-        "name": "_enrollmentNumber",
-        "type": "string"
-      }
-    ],
-    "name": "removeAccount",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -243,7 +201,7 @@ const loginABI = [
         "type": "string"
       }
     ],
-    "name": "signIn",
+    "name": "logIn",
     "outputs": [
       {
         "components": [
@@ -309,6 +267,62 @@ const loginABI = [
         "type": "string"
       }
     ],
+    "name": "modifyStudentSignUpData",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "_enrollmentNumber",
+        "type": "string"
+      }
+    ],
+    "name": "removeAccount",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "_firstName",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "_lastName",
+        "type": "string"
+      },
+      {
+        "internalType": "uint64",
+        "name": "_admissionYear",
+        "type": "uint64"
+      },
+      {
+        "internalType": "string",
+        "name": "_enrollmentNumber",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "_branch",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "_gender",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "_email",
+        "type": "string"
+      }
+    ],
     "name": "signUpStudents",
     "outputs": [],
     "stateMutability": "nonpayable",
@@ -316,7 +330,8 @@ const loginABI = [
   }
 ];
 
-const voterRegistrationContractAddress = "0x0462ABaC27840cb6f6B2D8509D794d78F5F2DFBF";
+const voterRegistrationContractAddress =
+  "0xF1BB4d1173f738eCcea07779e6E5e2b980258c81";
 const voterRegistrationABI = [
   {
     "inputs": [
@@ -328,6 +343,44 @@ const voterRegistrationABI = [
     ],
     "stateMutability": "nonpayable",
     "type": "constructor"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "enrollmentNumber",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "hasVoted",
+        "type": "bool"
+      }
+    ],
+    "name": "VoterRegister",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "enrollmentNumber",
+        "type": "string"
+      }
+    ],
+    "name": "VoterRemoved",
+    "type": "event"
   },
   {
     "inputs": [],
@@ -481,13 +534,7 @@ const voterRegistrationABI = [
       }
     ],
     "name": "modifyVoterData",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
+    "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
@@ -500,13 +547,7 @@ const voterRegistrationABI = [
       }
     ],
     "name": "registerVoter",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
+    "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
@@ -526,20 +567,15 @@ const voterRegistrationABI = [
       }
     ],
     "name": "removeSingleVoter",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
+    "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   }
 ];
 
-const candidateRegistrationContractAddress = "0xD64C5B66fcA9c6f0eaD0C28eD245Cef4A78379fB";
-const candidateRegistrationABI =  [
+const candidateRegistrationContractAddress =
+  "0x66D819D08DbfF4038dfCAaeb314f0A459e311318";
+const candidateRegistrationABI = [
   {
     "inputs": [
       {
@@ -550,6 +586,38 @@ const candidateRegistrationABI =  [
     ],
     "stateMutability": "nonpayable",
     "type": "constructor"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "enrollmentNumber",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "email",
+        "type": "string"
+      }
+    ],
+    "name": "CandidateRegister",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "enrollmentNumber",
+        "type": "string"
+      }
+    ],
+    "name": "CandidateRemoved",
+    "type": "event"
   },
   {
     "inputs": [],
@@ -752,13 +820,7 @@ const candidateRegistrationABI =  [
       }
     ],
     "name": "modfiyCandidateData",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
+    "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
@@ -771,19 +833,26 @@ const candidateRegistrationABI =  [
       }
     ],
     "name": "registerCandidate",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
+    "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
   {
     "inputs": [],
     "name": "removeAllCandidates",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "_candidateId",
+        "type": "string"
+      }
+    ],
+    "name": "removeSingleCandidate",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -803,7 +872,7 @@ const candidateRegistrationABI =  [
   }
 ];
 
-const VoteContractAddress = "0x42c350ac7bE3ea30808015DCF82B0c846fD35884";
+const VoteContractAddress = "0xE83b9Ad1753161dEbb73cFbd306B44984c7F3867";
 const VoteABI = [
   {
     "inputs": [
@@ -822,6 +891,72 @@ const VoteABI = [
     "type": "constructor"
   },
   {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "hasVote",
+        "type": "bool"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "registeredVoter",
+        "type": "bool"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "registeredCanidate",
+        "type": "bool"
+      }
+    ],
+    "name": "VoteConditions",
+    "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "deleteBatchedVotes",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getVotingStatus",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "processBatchedVotes",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "setVotingStatusFalse",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "setVotingStatusTrue",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "string",
@@ -834,36 +969,13 @@ const VoteABI = [
         "type": "string"
       }
     ],
-    "name": "castVote",
-    "outputs": [
-      {
-        "components": [
-          {
-            "internalType": "bool",
-            "name": "hasVote",
-            "type": "bool"
-          },
-          {
-            "internalType": "bool",
-            "name": "registeredVoter",
-            "type": "bool"
-          },
-          {
-            "internalType": "bool",
-            "name": "registeredCanidate",
-            "type": "bool"
-          }
-        ],
-        "internalType": "struct Vote.VoteConditions",
-        "name": "",
-        "type": "tuple"
-      }
-    ],
+    "name": "submitVotes",
+    "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   }
-];
-
+]
+// 447 988
 module.exports = {
   loginContractAddress,
   loginABI,
