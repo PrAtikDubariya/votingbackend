@@ -440,28 +440,40 @@ const submitVotes = async (req, res) => {
 
         let { voterId, candidateId } = req.body;
         voterId = voterId.toUpperCase();
-        candidateId = candidateId.toUpperCase();
+        candidateId = candidateId.enrollmentNumber.toUpperCase();
+        console.log(voterId, candidateId);
+
         const response = await VoteContractInstance.submitVotes(voterId, candidateId);
         const txReceipt = await response.wait(1);
-        
+            
         const eventFilter = VoteContractInstance.filters.VoteConditions();
         const events = await VoteContractInstance.queryFilter(eventFilter);
         let VoteConditions = {
-            hasVoted: false,
-            registeredVoter: false,
-            registeredCandidate:false
+                hasVoted: false,
+                registeredVoter: false,
+                registeredCandidate:false
         };
         events.forEach(event => {
             VoteConditions.hasVoted = event.args[0]
             VoteConditions.registeredVoter = event.args[1]
             VoteConditions.registeredCandidate = event.args[2]
         });
-        res.json({
-            success: true,
-            message: "Response Send",
-            response:VoteConditions
-        });
-        
+        console.log(VoteConditions);
+        if (VoteConditions.hasVoted) {
+            console.log(`${voterId} Already Voted`);
+            res.json({
+                success: true,
+                message: `${voterId} Already Voted`,
+                VoteConditions: VoteConditions
+            });
+        } else {
+            console.log(`${voterId} has voted`);
+            res.json({
+                success: true,
+                message: `${voterId} has Voted`,
+                VoteConditions: VoteConditions
+            });
+        }
     } catch (error) {
         res.json({
             success: false,

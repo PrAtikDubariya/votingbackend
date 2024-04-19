@@ -574,8 +574,8 @@ const voterRegistrationABI = [
 ];
 
 const candidateRegistrationContractAddress =
-  "0x66D819D08DbfF4038dfCAaeb314f0A459e311318";
-const candidateRegistrationABI = [
+  "0x23C1F36A3baac80D67C7D3C3586c547287FF679c";
+const candidateRegistrationABI =  [
   {
     "inputs": [
       {
@@ -617,6 +617,68 @@ const candidateRegistrationABI = [
       }
     ],
     "name": "CandidateRemoved",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "components": [
+          {
+            "components": [
+              {
+                "internalType": "string",
+                "name": "firstName",
+                "type": "string"
+              },
+              {
+                "internalType": "string",
+                "name": "lastName",
+                "type": "string"
+              },
+              {
+                "internalType": "uint64",
+                "name": "admissionYear",
+                "type": "uint64"
+              },
+              {
+                "internalType": "string",
+                "name": "enrollmentNumber",
+                "type": "string"
+              },
+              {
+                "internalType": "string",
+                "name": "branch",
+                "type": "string"
+              },
+              {
+                "internalType": "string",
+                "name": "gender",
+                "type": "string"
+              },
+              {
+                "internalType": "string",
+                "name": "email",
+                "type": "string"
+              }
+            ],
+            "internalType": "struct Login.SignUp",
+            "name": "candidate",
+            "type": "tuple"
+          },
+          {
+            "internalType": "uint64",
+            "name": "voteCount",
+            "type": "uint64"
+          }
+        ],
+        "indexed": false,
+        "internalType": "struct CandidateRegistration.Candidate[]",
+        "name": "winners",
+        "type": "tuple[]"
+      }
+    ],
+    "name": "WinnerGet",
     "type": "event"
   },
   {
@@ -872,7 +934,7 @@ const candidateRegistrationABI = [
   }
 ];
 
-const VoteContractAddress = "0xE83b9Ad1753161dEbb73cFbd306B44984c7F3867";
+const VoteContractAddress = "0x63169F6Dc77977e4776850E38fc31289D2850f08";
 const VoteABI = [
   {
     "inputs": [

@@ -16,6 +16,7 @@ const {
     VoteABI
 } = require("../constants");
 const votingSchema = require('../model/votingSchema');
+const { setInterval } = require('timers/promises');
 
 const SEPOLIA_RPC_URL = process.env.SEPOLIA_RPC_URL;
 const PRIVATE_KEY = process.env.PRIVATE_KEY;
@@ -54,7 +55,7 @@ const getAllVoters = async (req, res) => {
                 branch: voter[0][4],
                 gender: voter[0][5],
                 email: voter[0][6],
-                hasVoted: voter[1],
+                hasVoted: String (voter[1]),
             };
           });
         console.log(response);
@@ -296,15 +297,32 @@ const removeSignUpAccount = async (req,res) => {
 const setVotingStatusTrue = async (req, res, io) => {
     try {
 
-        const { votingDuration } = req.body;
-
+        let { votingDuration } = req.body;
+        console.log(votingDuration);
         const setVotingTrue = await votingSchema.votingStart.findByIdAndUpdate('65d70acc4d27e3e1c6660b05',
             { isVotingStart: true },
             { new: true }
         );
 
+        const d = new Date();
+        let date = d.toLocaleString();
+        console.log(date);
+        let parsedDate = new Date(date);
+        parsedDate.setHours(parsedDate.getHours());
+        parsedDate.setMinutes(parsedDate.getMinutes());
+        parsedDate.setMinutes(parsedDate.getMinutes() + parseInt(votingDuration));
+        let newDate = parsedDate.toLocaleString();
+        console.log(newDate);
+        
+        const votingTimer = await votingSchema.votingTimer.findByIdAndUpdate('65fe764778857ce0b11a6719',
+            { voteTimer: newDate },
+            { new: true }
+        );
+        console.log(votingTimer.voteTimer);
+
+        
         io.emit('votingStarted', { isVotingStart: setVotingTrue.isVotingStart });
-        io.emit('votingDuration',{ votingDuration:votingDuration });
+        io.emit('votingDuration', { votingDuration: votingTimer.voteTimer });
 
         res.json({
             success: true,
@@ -328,7 +346,13 @@ const setVotingStatusFalse = async (req, res,io) => {
             { new: true }
         );
 
+        const votingTimer = await votingSchema.votingTimer.findByIdAndUpdate('65fe764778857ce0b11a6719',
+            { voteTimer: null },
+            { new: true }
+        );
+
         io.emit('votingEnded', { isVotingStart: setVotingFalse.isVotingStart });
+        io.emit('votingDuration', { votingDuration: votingTimer.voteTimer });
         
         res.json({
             success: true,
@@ -398,12 +422,57 @@ const resetPortal = async (req, res) => {
     }
 }
 
-const getWinner = async (req, res) => {
+const getWinner = async (req, res,io) => {
     try {
+
         const response = await candidateContractInstance.getWinner();
+        const txReceipt = await response.wait(1);
+
+        const eventFilter = candidateContractInstance.filters.WinnerGet();
+        const events = await candidateContractInstance.queryFilter(eventFilter);
+
+        if (events.length === 0) {
+            return res.json({
+                success: false,
+                error: "No WinnerGet event found"
+            });
+        }
+
+        const latestEvent = events[events.length - 1];
+        const eventData = latestEvent.args[0];
+        const uniqueWinnersMap = {};
+
+        for (let j = 0; j < eventData.length; j++) {
+
+            const candidateData = eventData[j];
+
+            const winner = {
+                firstName: candidateData.candidate.firstName,
+                lastName: candidateData.candidate.lastName,
+                admissionYear: parseInt(candidateData.candidate.admissionYear),
+                enrollmentNumber: candidateData.candidate.enrollmentNumber,
+                branch: candidateData.candidate.branch,
+                gender: candidateData.candidate.gender,
+                email: candidateData.candidate.email,
+                voteCount: parseInt(candidateData.voteCount)
+            };
+
+            if (!uniqueWinnersMap[winner.enrollmentNumber]) {
+                uniqueWinnersMap[winner.enrollmentNumber] = winner;
+            }
+        }
+
+        // Convert the unique winners object back to an array
+        const uniqueWinners = Object.values(uniqueWinnersMap);
+
+        if (uniqueWinners) {
+            io.emit('resultDeclared', { isResult: true });
+            io.emit('Winners', { winners: uniqueWinners });
+        }
+
         res.json({
             success: true,
-            winners: response
+            winners: uniqueWinners
         });
     } catch (error) {
         res.json({

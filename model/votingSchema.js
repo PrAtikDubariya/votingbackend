@@ -10,7 +10,6 @@ const VotingStartSchema = new mongoose.Schema({
 const VoteTimerSchema = new mongoose.Schema({
     voteTimer: {
         type: String,
-        required: true
     }
 });
 

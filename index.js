@@ -36,5 +36,13 @@ app.set('io', io);
 io.on('connection', (socket) => {
   app.use("/api/login", LogInRoute);
   app.use("/api/admin", AdminRoute);
-})
 
+  socket.on('diconnect', () => {
+    console.log("Client Disconnected");
+  });
+
+  socket.on('reconnect', () => {
+    console.log('A user reconnected');
+  });
+
+})

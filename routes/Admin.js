@@ -22,7 +22,9 @@ adminRouter.post("/set/voting/status/false", (req, res) => {
 });
 adminRouter.post("/get/voting/status", getVotingStatus);
 adminRouter.post("/proceed/batch/votes", processBatchedVotes);
-adminRouter.post("/get/winner", getWinner);
+adminRouter.post("/get/winner", (req, res) => {
+    adminController.getWinner(req, res, req.app.get('io'));
+});
 adminRouter.post("/reset/portal", resetPortal);
 
 module.exports = adminRouter;
